@@ -1,1 +1,0 @@
-/Users/olikim/src/ok-my-first-blazor-app/Client/bin/Release/net9.0/publish/web.config
