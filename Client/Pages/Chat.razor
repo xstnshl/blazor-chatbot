@@ -160,7 +160,7 @@
         try
         {
             webSocket = new ClientWebSocket();
-            await webSocket.ConnectAsync(new Uri("wss://localhost:5051/ws"), CancellationToken.None);
+            await webSocket.ConnectAsync(new Uri("ws://localhost:5050/ws"), CancellationToken.None);
             isConnected = true;
 
             _ = ReceiveLoop();
