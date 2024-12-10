@@ -1,0 +1,248 @@
+@page "/"
+@page "/chat"
+@using System.Net.WebSockets
+@using System.Text
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@using System.Threading
+@inject IJSRuntime JSRuntime
+
+<div class="chat-container">
+    <div class="navbar">
+        <span>Chat Messages</span>
+        <small>Scroll up to see history</small>
+    </div>
+    <div class="messages-container" id="messageContainer">
+        @foreach (var msg in messages)
+        {
+            @if (msg.StartsWith("You: "))
+            {
+                <div class="message sent">
+                    <div class="message-content">@msg.Substring(5)</div>
+                </div>
+            }
+            else
+            {
+                <div class="message received">
+                    <div class="message-content">@msg</div>
+                </div>
+            }
+        }
+    </div>
+    <div class="input-container">
+        <input type="text" 
+               class="message-input" 
+               @bind="message" 
+               @onkeyup="HandleKeyPress" 
+               placeholder="Type your message..." />
+        <button class="send-button" @onclick="SendMessage">Send</button>
+    </div>
+</div>
+
+<style>
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+
+    .navbar {
+        padding: 1rem;
+        background-color: #007bff;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .navbar small {
+        opacity: 0.8;
+    }
+
+.messages-container {
+    flex: 1;
+    overflow-y: scroll !important;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+    .message {
+        margin-bottom: 10px;
+        max-width: 70%;
+        clear: both;
+    }
+
+    .message.sent {
+        float: right;
+    }
+
+    .message.received {
+        float: left;
+    }
+
+    .message-content {
+        padding: 12px;
+        border-radius: 20px;
+    }
+
+    .sent .message-content {
+        background-color: #007bff;
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .received .message-content {
+        background-color: white;
+        color: black;
+        border-bottom-left-radius: 4px;
+    }
+
+    .input-container {
+        display: flex;
+        padding: 20px;
+        background-color: white;
+        border-top: 1px solid #ddd;
+    }
+
+    .message-input {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        margin-right: 10px;
+    }
+
+    .send-button {
+        padding: 12px 24px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+
+    .send-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+@code {
+    private string message = "";
+    private List<string> messages = new List<string>();
+    private ClientWebSocket webSocket;
+    private bool isConnected = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ConnectWebSocket();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await ScrollToBottom();
+    }
+
+    private async Task ScrollToBottom()
+    {
+        await JSRuntime.InvokeVoidAsync("scrollToBottom", "messageContainer");
+    }
+
+    private async Task ConnectWebSocket()
+    {
+        try
+        {
+            webSocket = new ClientWebSocket();
+            await webSocket.ConnectAsync(new Uri("wss://localhost:5051/ws"), CancellationToken.None);
+            isConnected = true;
+
+            _ = ReceiveLoop();
+        }
+        catch (Exception ex)
+        {
+            messages.Add($"Connection error: {ex.Message}");
+            StateHasChanged();
+        }
+    }
+
+    private async Task ReceiveLoop()
+    {
+        var buffer = new byte[4096];
+        try
+        {
+            while (webSocket.State == WebSocketState.Open)
+            {
+                var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                if (result.MessageType == WebSocketMessageType.Text)
+                {
+                    var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    messages.Add(message);
+                    StateHasChanged();
+                    await ScrollToBottom();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (webSocket.State == WebSocketState.Open)
+            {
+                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed by client", CancellationToken.None);
+            }
+            isConnected = false;
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrEmpty(message)) return;
+
+        if (webSocket.State == WebSocketState.Open)
+        {
+            try
+            {
+                messages.Add($"You: {message}");
+                var bytes = Encoding.UTF8.GetBytes(message);
+                await webSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
+                message = "";
+                StateHasChanged();
+                await ScrollToBottom();
+            }
+            catch (Exception ex)
+            {
+                messages.Add($"Error sending message: {ex.Message}");
+            }
+        }
+        else
+        {
+            messages.Add("WebSocket is not connected. Attempting to reconnect...");
+            await ConnectWebSocket();
+        }
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendMessage();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (webSocket != null)
+        {
+            if (webSocket.State == WebSocketState.Open)
+            {
+                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed by client", CancellationToken.None);
+            }
+            webSocket.Dispose();
+        }
+    }
+}

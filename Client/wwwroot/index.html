@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>ok-my-first-blazor-app</title>
+    <base href="/" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link href="ok-my-first-blazor-app.Client.styles.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="app">Loading...</div>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        window.scrollToBottom = (elementId) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.scrollTop = element.scrollHeight;
+            }
+        }
+    </script>
+    </body>
+</html>

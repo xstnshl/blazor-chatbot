@@ -1,0 +1,22 @@
+﻿<Project>
+  <ItemGroup>
+    <StaticWebAssetEndpoint Include="index.4ou3nk0fhf.html">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\index.html'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"4ou3nk0fhf"},{"Name":"integrity","Value":"sha256-/Dr4CjJKH\u002BHMYkIRNxLu2k5FM4C68JfyC\u002BepPiKIiIg="},{"Name":"label","Value":"index.html"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"387"},{"Name":"Content-Type","Value":"text/html"},{"Name":"ETag","Value":"\u0022/Dr4CjJKH\u002BHMYkIRNxLu2k5FM4C68JfyC\u002BepPiKIiIg=\u0022"},{"Name":"Last-Modified","Value":"Tue, 10 Dec 2024 01:55:04 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="index.html">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\index.html'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-/Dr4CjJKH\u002BHMYkIRNxLu2k5FM4C68JfyC\u002BepPiKIiIg="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"387"},{"Name":"Content-Type","Value":"text/html"},{"Name":"ETag","Value":"\u0022/Dr4CjJKH\u002BHMYkIRNxLu2k5FM4C68JfyC\u002BepPiKIiIg=\u0022"},{"Name":"Last-Modified","Value":"Tue, 10 Dec 2024 01:55:04 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_framework/blazor.webassembly.js">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\_framework\blazor.webassembly.js'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-lh8bY3DINgTiqGL/cwOeVaJGdfE2ex1o8MzwCbmlZZE="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"57249"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022lh8bY3DINgTiqGL/cwOeVaJGdfE2ex1o8MzwCbmlZZE=\u0022"},{"Name":"Last-Modified","Value":"Tue, 29 Oct 2024 13:25:32 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+  </ItemGroup>
+</Project>
