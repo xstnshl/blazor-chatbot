@@ -6,6 +6,23 @@
 @using Microsoft.JSInterop
 @using System.Threading
 @inject IJSRuntime JSRuntime
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h3>User Information</h3>
+
+@if (user != null)
+{
+    <p>Logged in as: @user.Identity.Name</p>
+    <p>Email: @user.FindFirst("preferred_username")?.Value</p>
+}
+else
+{
+    <p>Loading...</p>
+}
+
 
 <div class="chat-container">
     <div class="navbar">
@@ -140,7 +157,26 @@
     private ClientWebSocket webSocket;
     private bool isConnected = false;
 
+    private ClaimsPrincipal? user;
+
     protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            Console.WriteLine($"User is authenticated: {user.Identity.Name}");
+        }
+        else
+        {
+            Console.WriteLine("User is not authenticated.");
+        }
+        InitializeWebSocketAsync();
+
+    }
+
+    private async Task InitializeWebSocketAsync()
     {
         await ConnectWebSocket();
     }

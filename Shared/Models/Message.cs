@@ -13,6 +13,6 @@ namespace Shared.Models
         public object RawMessage { get; set; }
         public string Id { get; set; }
         public bool IsUser { get; set; }
-        public List<Attachment> Attachments { get; set; }
+        public List<Attachment> Attachments { get; set; } = new List<Attachment>();
     }
 }
